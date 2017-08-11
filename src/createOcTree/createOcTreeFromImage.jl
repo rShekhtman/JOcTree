@@ -5,28 +5,7 @@ function createOcTreeFromImage(A::Array{UInt8,3},tol);
 # A - image
 # tol - equal intensity color
 
- #  m1,m2,m3 = size(A)
- #  mm = m1*m2*m3
-
    maxbsz  = minimum(size(A))
-
-# initialize OcTree
-#  N1   = floor(Integer,m1/maxbsz); N2 = floor(Integer,m2/maxbsz); N3 = floor(Integer,m3/maxbsz)
-#  ii   = zeros(Int,N1*N2*N3)
-#  jj   = zeros(Int,N1*N2*N3)
-#  kk   = zeros(Int,N1*N2*N3)
-#  bsz  = zeros(Int,N1*N2*N3)
-#  cnt = 1
-#  for i=1:maxbsz:m1
-#     for j=1:maxbsz:m2
-#        for k = 1:maxbsz:m3
-#           ii[cnt] = i; jj[cnt] = j; kk[cnt] = k; bsz[cnt] = maxbsz
-#           cnt += 1
-#        end
-#     end
-#  end
-#
-#  S = Mesh.sparse3(round(Int64,ii),round(Int64,jj),round(Int64,kk),round(Int64,bsz),[m1,m2,m3])
    
    S = initializeOctree( collect(size(A)) )
    
@@ -36,7 +15,6 @@ function createOcTreeFromImage(A::Array{UInt8,3},tol);
       nz = nnz(S)
       S = refineOcTreeTol(S,A,tol,bszmin)
       bszmin = div(bszmin, 2)
-      #S = regularizeOcTree(S)
       if nnz(S) == nz
          break
       end
@@ -69,8 +47,6 @@ function refineOcTreeTol(S,A,tol,bszmin)
          j1 = tj[m]; j2 = j1+tb[m]-1
          k1 = tk[m]; k2 = k1+tb[m]-1
 
-         #println(i1," ",i2," ",j1," ",j2," ",k1," ",k2," ",tb[m])
-         #aijk = vec(A[i1:i2,j1:j2,k1:k2])
          minA, maxA = extrema(A[i1:i2,j1:j2,k1:k2])
          blk = tb[m]
          if maxA - minA >= tol
@@ -122,14 +98,9 @@ function refineOcTreeTol(S,A,tol,bszmin)
       end # if
    end # for
    
-#   ti  = ti[1:cnt-1]
-#   tj  = tj[1:cnt-1]
-#   tk  = tk[1:cnt-1]
-#   tb  = tb[1:cnt-1]
    
    Sr = sparse3(ti[1:cnt-1], tj[1:cnt-1], tk[1:cnt-1], tb[1:cnt-1], [m1,m2,m3])
 
-#  ti,tj,tk,tb = find3(Sr)
    
    return Sr
 

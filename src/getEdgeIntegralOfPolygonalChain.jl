@@ -103,6 +103,7 @@ scaleZ = hz
 
 if normalize
    scale = getNormalizeVal(polygon)
+   if scale <= 0 ; error("scale <= 0") ; end
    scaleX /= scale
    scaleY /= scale
    scaleZ /= scale

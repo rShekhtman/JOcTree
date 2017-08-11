@@ -1,6 +1,21 @@
 export initializeOctree, OctreeBox, octreeRegion
 
 
+"""
+    S = initializeOctree(n, bsz)
+
+    Initialize octree mesh to the coarsest cells
+
+    Input:
+
+        n::Vector{Int64} - number of underlying cells
+        bsz::Int64=0     - cell size (0 for largest)
+
+    Output:
+
+        S::SparseArray3D
+
+"""
 function initializeOctree( n::Vector{Int64},   # number of underlying cells
                            bsz::Int64=0)  # cell size (0 for largest)
 # Initialize octree mesh to the coarsest cells
@@ -46,7 +61,6 @@ end
 
 while true
    i,j,k,bsz = find3(S)
-  # tau = zeros(nnz(S))
    nns = nnz(S)
    splitcells = Array{Int64}(nns)
    nsplit = 0  # counter for the number of cells to split.

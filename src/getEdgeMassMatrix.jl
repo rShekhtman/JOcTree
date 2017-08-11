@@ -279,27 +279,51 @@ c[idz] = b[idz]
 return c
 end
 
-function DerivativeTimesVector(M::OcTreeMeshFV, v::Vector,
+
+function DerivativeTimesVector(M::OcTreeMeshFV, sigma::Vector, v::Vector,
                                x::Vector)
    # Derivative (getdEdgeMassMatrix) times a vector(x)
    if isempty(M.Pe)
       M.Pe = getEdgeMassMatrixIntegrationMatrix(M.S,M.h)
    end
 
+   n = length(sigma)
+   if length(x) != n
+      error("length(x) != length(sigma)")
+   end
+   
+   if n == 6 * M.nc
+      # Not the best solution!
+      dM = getdEdgeMassMatrix(M,sigma,v)
+      return dM * x
+   end
+
   # dM = M.Pe'* sdiag(M.Pe*v) * kron(ones(24,1),speye(nnz(M.S)))
 
    pv = M.Pe * v
 
-   dMw = M.Pe' * (pv .* repmat(x,24))
+   if n == M.nc
+      dMx = M.Pe' * (pv .* repmat(x,24))
+   elseif n == 3 * M.nc
+      dMx = M.Pe' * (pv .* repmat(x,8))
+   end
    
-   return dMw
+   return dMx
 end  # function DerivativeTimesVector
 
-function DerivativeTrTimesVector(M::OcTreeMeshFV, v::Vector,
+
+function DerivativeTrTimesVector(M::OcTreeMeshFV, sigma::Vector, v::Vector,
                                  x::Vector)
    # Derivative (getdEdgeMassMatrix) transpose times a vector(x)
    if isempty(M.Pe)
       M.Pe = getEdgeMassMatrixIntegrationMatrix(M.S,M.h)
+   end
+
+   n = length(sigma)
+   if n == 6 * M.nc
+      # Not the best solution!
+      dM = getdEdgeMassMatrix(M,sigma,v)
+      return dM' * x
    end
 
   # dM' = kron(ones(24,1),speye(nnz(M.S)))' * sdiag(M.Pe*v) * M.Pe
@@ -308,26 +332,23 @@ function DerivativeTrTimesVector(M::OcTreeMeshFV, v::Vector,
    dd = pv .* (M.Pe * conj(x)) 
    pv = [] 
 
-   ns = nnz(M.S)
-   dMTw = dd[1:ns]
+   if n == M.nc
+      ns = M.nc
+      i2 = 24
+   elseif n == 3 * M.nc
+      ns = 3 * M.nc
+      i2 = 8
+   end
+
+   dMTx = dd[1:ns]
 
    j = ns
-   for i = 2:24
-      @inbounds dMTw += dd[j+1 : j+ns]
+   for i = 2:i2
+      @inbounds dMTx += dd[j+1 : j+ns]
       j += ns
    end  # i
-   dMTw = conj(dMTw)
+   dMTx = conj(dMTx)
 
-   return dMTw
+   return dMTx
 end  # function DerivativeTrTimesVector
 
-function getNodesFromIndices(sv,mm,i0::Vector{Int},j0::Vector{Int},k0::Vector{Int})
-	
-	jj = sub2ind(mm,i0,j0,k0)
-  v  = Array(Int64, length(jj))
-  for i = 1:length(jj)
-    v[i] = sv[jj[i]]
-  end
-	return v
-	
-end

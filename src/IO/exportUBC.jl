@@ -14,7 +14,6 @@ export exportUBCOcTreeMesh, exportUBCOcTreeModel, outputOctreeMesh
             
 """
 function exportUBCOcTreeMesh(fname::AbstractString, mesh::OcTreeMesh)
-# Export OcTree for use with Roman's Fortran codes.
 
    m1,m2,m3     = mesh.n
    i1,i2,i3,bsz = find3(mesh.S)
@@ -61,7 +60,6 @@ end  # function exportUBCOcTreeMesh
 """
 function exportUBCOcTreeModel(fname::AbstractString, mesh::OcTreeMesh, 
                               model::Union{Array{Float64,1}, Array{Int64,1}})
-# Export OcTree cell property for use with Roman's Fortran codes.
 
    m1,m2,m3     = mesh.n
    i1,i2,i3,bsz = find3(mesh.S)
@@ -79,7 +77,13 @@ function exportUBCOcTreeModel(fname::AbstractString, mesh::OcTreeMesh,
    # Write model vector
    f = open(fname, "w")
    for i = 1:n
-   	println(f, modelPerm[i])
+   	#println(f, modelPerm[i])
+      mm = modelPerm[i]
+      if mm == 1.e-8 || mm == 0.
+   	   @printf(f, "%8.1e\n", mm)
+   	else
+   	   @printf(f, "%12.5e\n", mm)
+   	end
    end
    close(f)
 

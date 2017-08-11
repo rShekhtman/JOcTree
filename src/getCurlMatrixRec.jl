@@ -9,7 +9,7 @@ function getCurlMatrix(M::OcTreeMeshFV)
 end
 
 
-using MaxwellUtils.DiagTimesMTimesDiag
+#using MaxwellUtils.DiagTimesMTimesDiag
 
 #function getCurlMatrixRec(S,h)
 function getCurlMatrixRec(M)
@@ -19,10 +19,6 @@ function getCurlMatrixRec(M)
 S = M.S; h = M.h
 
 m1,m2,m3    = S.sz
-#FX,FY,FZ    = getFaceSize(M)
-#EX,EY,EZ    = getEdgeSize(M)
-#NFX,NFY,NFZ = getFaceNumbering(M)
-#NEX,NEY,NEZ = getEdgeNumbering(M)
 FX,FY,FZ, NFX,NFY,NFZ = getFaceSizeNumbering(M)
 EX,EY,EZ, NEX,NEY,NEZ = getEdgeSizeNumbering(M)
 
@@ -44,15 +40,15 @@ fn        = nonzeros(NFX)
 # DYZ COMPUTES THE DERIVATIVE OF Y-EDGES INTO Z-DIRECTION AND
 # DYZ : m1+1 x m2 x m3+1  -->  m1+1 x m2 x m3
 
-front    = NEY.SV[sub2ind(NEY.sz,i,j,k),1];  front = vec(full(front))
-back     = NEY.SV[sub2ind(NEY.sz,i,j,k+fsz),1];  back  = vec(full(back))
+front    = NEY.SV[sub2ind(NEY.sz,i,j,k)];  front = vec(full(front))
+back     = NEY.SV[sub2ind(NEY.sz,i,j,k+fsz)];  back  = vec(full(back))
 frontmid = zeros(Int64, length(front))
 backmid  = zeros(Int64, length(back))
 
 I =  (j+div(fsz,2) .<= m2) & (fsz .>= 2) 
 if any(I)
-  frontmid[I] = NEY.SV[sub2ind(NEY.sz, i[I] , j[I]+div(fsz[I],2) , k[I]  ),1]
-  backmid[I]  = NEY.SV[sub2ind(NEY.sz, i[I] , j[I]+div(fsz[I],2) , k[I]+fsz[I] ),1]
+  frontmid[I] = NEY.SV[sub2ind(NEY.sz, i[I] , j[I]+div(fsz[I],2) , k[I]  )]
+  backmid[I]  = NEY.SV[sub2ind(NEY.sz, i[I] , j[I]+div(fsz[I],2) , k[I]+fsz[I] )]
 end
 # front y
 
@@ -75,15 +71,15 @@ DYZ = sparse(ii, jj, vv,nnz(NFX),nnz(NEY))
 # THEREFOR DZY : m1+1 x m2+1 x m3  -->  m1+1 x m2 x m3
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-left     = NEZ.SV[sub2ind(NEZ.sz,i,j,k    ),1];  left  = vec(full(left))
-right    = NEZ.SV[sub2ind(NEZ.sz,i,j+fsz,k),1];  right = vec(full(right))
+left     = NEZ.SV[sub2ind(NEZ.sz,i,j,k    )];  left  = vec(full(left))
+right    = NEZ.SV[sub2ind(NEZ.sz,i,j+fsz,k)];  right = vec(full(right))
 leftmid  = zeros(Int64, length(left))
 rightmid = zeros(Int64, length(right))
 
 I = (j+div(fsz,2) .<= m2) & (fsz .>= 2)
 if any(I)
-    leftmid[I]  = NEZ.SV[sub2ind(NEZ.sz, i[I], j[I],        k[I]+div(fsz[I],2) ),1]
-    rightmid[I] = NEZ.SV[sub2ind(NEZ.sz, i[I], j[I]+fsz[I], k[I]+div(fsz[I],2) ),1]
+    leftmid[I]  = NEZ.SV[sub2ind(NEZ.sz, i[I], j[I],        k[I]+div(fsz[I],2) )]
+    rightmid[I] = NEZ.SV[sub2ind(NEZ.sz, i[I], j[I]+fsz[I], k[I]+div(fsz[I],2) )]
 end
 Il1 = (leftmid .== 0)  # SINGLE LEFT EDGE PER FACE
 Il2 = (leftmid .>  0)  # 2 LEFT EDGES PER FACE
@@ -118,15 +114,15 @@ fn        = nonzeros(NFY)
 # DXZ COMPUTES THE DERIVATIVE OF X-EDGES INTO Z-DIRECTION AND
 # DXZ : m1 x m2+1 x m3+1  -->  m1 x m2+1 x m3
 
-front    = NEX.SV[sub2ind(NEX.sz,i,j,k    ),1];  front = vec(full(front))
-back     = NEX.SV[sub2ind(NEX.sz,i,j,k+fsz),1];  back  = vec(full(back));
+front    = NEX.SV[sub2ind(NEX.sz,i,j,k    )];  front = vec(full(front))
+back     = NEX.SV[sub2ind(NEX.sz,i,j,k+fsz)];  back  = vec(full(back));
 frontmid = zeros(Int64, length(front))
 backmid  = zeros(Int64, length(back))
 
 I = (i+div(fsz,2) .<= m1) & (fsz .>= 2) 
 if any(I)
-    frontmid[I] = NEX.SV[sub2ind(NEX.sz, i[I]+div(fsz[I],2) , j[I] , k[I]),1]
-    backmid[I]  = NEX.SV[sub2ind(NEX.sz, i[I]+div(fsz[I],2) , j[I] , k[I]+fsz[I]),1]
+    frontmid[I] = NEX.SV[sub2ind(NEX.sz, i[I]+div(fsz[I],2) , j[I] , k[I])]
+    backmid[I]  = NEX.SV[sub2ind(NEX.sz, i[I]+div(fsz[I],2) , j[I] , k[I]+fsz[I])]
 end
 
 If1 = (frontmid .== 0)  # SINGLE FRONT EDGE PER FACE
@@ -148,15 +144,15 @@ DXZ = sparse(ii, jj, vv,nnz(NFY),nnz(NEX))
 # THEREFOR DZX : m1+1 x m2+1 x m3  -->  m1 x m2+1 x m3
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-upper    = NEZ.SV[sub2ind(NEZ.sz,i    ,j,k),1];  upper = vec(full(upper))
-lower    = NEZ.SV[sub2ind(NEZ.sz,i+fsz,j,k),1];  lower = vec(full(lower))
+upper    = NEZ.SV[sub2ind(NEZ.sz,i    ,j,k)];  upper = vec(full(upper))
+lower    = NEZ.SV[sub2ind(NEZ.sz,i+fsz,j,k)];  lower = vec(full(lower))
 uppermid = zeros(Int64, length(upper))
 lowermid = zeros(Int64, length(lower))
 
 I = (i+div(fsz,2) .<= m1) & (fsz .>= 2) 
 if any(I)
-    uppermid[I] = NEZ.SV[sub2ind(NEZ.sz, i[I], j[I], k[I]+div(fsz[I],2) ),1]
-    lowermid[I] = NEZ.SV[sub2ind(NEZ.sz, i[I]+fsz[I] , j[I] , k[I]+div(fsz[I],2) ),1]
+    uppermid[I] = NEZ.SV[sub2ind(NEZ.sz, i[I], j[I], k[I]+div(fsz[I],2) )]
+    lowermid[I] = NEZ.SV[sub2ind(NEZ.sz, i[I]+fsz[I] , j[I] , k[I]+div(fsz[I],2) )]
 end
 Iu1 = (uppermid .== 0)  # SINGLE UPPER EDGE PER FACE
 Iu2 = (uppermid .>  0)  # 2 UPPER EDGES PER FACE
@@ -188,16 +184,16 @@ fn        = nonzeros(NFZ)
 # THEREFOR DXY : m1 x m2+1 x m3+1  -->  m1 x m2 x m3+1
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-left     = NEX.SV[sub2ind(NEX.sz,i,j,k    ),1];  left  = vec(full(left))
-right    = NEX.SV[sub2ind(NEX.sz,i,j+fsz,k),1];  right = vec(full(right))
+left     = NEX.SV[sub2ind(NEX.sz,i,j,k    )];  left  = vec(full(left))
+right    = NEX.SV[sub2ind(NEX.sz,i,j+fsz,k)];  right = vec(full(right))
 leftmid  = zeros(Int64, length(left))
 rightmid = zeros(Int64, length(right))
 
 I = (i+div(fsz,2) .<= m1) & (fsz .>= 2) 
 
 if any(I)
-    leftmid[I]  = NEX.SV[sub2ind(NEX.sz, i[I]+div(fsz[I],2), j[I]        , k[I] ),1]
-    rightmid[I] = NEX.SV[sub2ind(NEX.sz, i[I]+div(fsz[I],2), j[I]+fsz[I] , k[I] ),1]
+    leftmid[I]  = NEX.SV[sub2ind(NEX.sz, i[I]+div(fsz[I],2), j[I]        , k[I] )]
+    rightmid[I] = NEX.SV[sub2ind(NEX.sz, i[I]+div(fsz[I],2), j[I]+fsz[I] , k[I] )]
 end
 Il1 = (leftmid .== 0)  # SINGLE LEFT EDGE PER FACE
 Il2 = (leftmid .>  0)  # 2 LEFT EDGES PER FACE
@@ -217,15 +213,15 @@ DXY = sparse(ii, jj, vv,nnz(NFZ),nnz(NEX))
 #% THEREFOR DYX : m1+1 x m2 x m3+1  -->  m1 x m2 x m3+1
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-upper    = NEY.SV[sub2ind(NEY.sz,i    ,j,k),1];  upper = vec(full(upper))
-lower    = NEY.SV[sub2ind(NEY.sz,i+fsz,j,k),1];  lower = vec(full(lower))
+upper    = NEY.SV[sub2ind(NEY.sz,i    ,j,k)];  upper = vec(full(upper))
+lower    = NEY.SV[sub2ind(NEY.sz,i+fsz,j,k)];  lower = vec(full(lower))
 uppermid = zeros(Int64, length(upper))
 lowermid = zeros(Int64, length(lower))
 
 I = (j+div(fsz,2) .<= m2) & (fsz .>= 2) 
 if any(I)
-    uppermid[I] = NEY.SV[sub2ind(NEY.sz, i[I]        , j[I]+div(fsz[I],2) , k[I] ),1]
-    lowermid[I] = NEY.SV[sub2ind(NEY.sz, i[I]+fsz[I] , j[I]+div(fsz[I],2) , k[I] ),1]
+    uppermid[I] = NEY.SV[sub2ind(NEY.sz, i[I]        , j[I]+div(fsz[I],2) , k[I] )]
+    lowermid[I] = NEY.SV[sub2ind(NEY.sz, i[I]+fsz[I] , j[I]+div(fsz[I],2) , k[I] )]
 end
 Iu1 = (uppermid .== 0)  # SINGLE UPPER EDGE PER FACE
 Iu2 = (uppermid .>  0)  # 2 UPPER EDGES PER FACE

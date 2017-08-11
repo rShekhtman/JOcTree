@@ -1,4 +1,4 @@
-export SparseArray3D, sparse3, find3, nonzeros, nfilled, nnz, getindex, setindex!, read, write
+export SparseArray3D, sparse3, find3, nonzeros, nnz, getindex, setindex!
 
 # Extend polymorphic methods in module Base
 import Base.nonzeros
@@ -8,7 +8,7 @@ import Base.setindex!
 import Base.ndims 
 
 type SparseArray3D
-        SV::SparseMatrixCSC{Int64}
+        SV::SparseVector{Int64}  #  SparseMatrixCSC
         sz::Vector{Int64}    # size of fine mesh
 end
 
@@ -41,7 +41,6 @@ function sparse3(i::Vector{Int},j::Vector{Int},k::Vector{Int},v::Vector{Int},sz:
    # Note that the following line would sort IND, and v would be permuted.  For
    # duplicate IND values, a SMALLEST v would be used.
    IND, v = sortpermFast(IND, v)
-   #v = v[p]
    S = sparsevec(IND,v, prod(sz))
    S3 = SparseArray3D(S,sz)
    return S3
@@ -51,7 +50,6 @@ end
 function sparse3(i::Vector{Int},j::Vector{Int},k::Vector{Int},v::Vector{Int},sz::Vector{Int},combine::Function)
 
         IND = sub2ind(sz,i,j,k)
-        # S = sparse(round(Int64,IND),round(Int64,ones(length(IND))),v,round(Int64,prod(sz)),1)
    	  S = sparsevec(IND,v, prod(sz), combine)
         return SparseArray3D(S,sz)
 end

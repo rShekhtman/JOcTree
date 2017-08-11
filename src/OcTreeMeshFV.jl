@@ -42,6 +42,7 @@ type OcTreeMeshFV <: OcTreeMesh
 	NEX::SparseArray3D # X EdgeNumbering
 	NEY::SparseArray3D # Y EdgeNumbering
 	NEZ::SparseArray3D # Z EdgeNumbering
+	dim::Int           # Mesh dimension
 end # type OcTreeMeshFV
 
 	
@@ -53,12 +54,10 @@ function getOcTreeMeshFV(S,h;x0=zeros(3))
 		nc   = nnz(S)
 		
       # get number of faces
-   #  FX,FY,FZ = getFaceSize(S)
       FX,FY,FZ, NFX, NFY, NFZ = getFaceSizeNumbering(S)
       nf   = [nnz(FX); nnz(FY); nnz(FZ)]
       
       # get number of edges
-    #  EX,EY,EZ = getEdgeSize(S)
       EX,EY,EZ, NEX, NEY, NEZ = getEdgeSizeNumbering(S)
       ne   = [nnz(EX); nnz(EY); nnz(EZ)]
       
@@ -72,7 +71,7 @@ function getOcTreeMeshFV(S,h;x0=zeros(3))
                           empt,empt,empt,empt, #no Nn,Qn,Nf,Qf
                           FX,FY,FZ, EX,EY,EZ,
                           NFX, NFY, NFZ, 
-                          NEX, NEY, NEZ)
+                          NEX, NEY, NEZ, 3)
 end  # function getOcTreeMeshFV
 
 
@@ -113,7 +112,7 @@ end  # function clear
 
 import Base.==
 function ==(M1::OcTreeMeshFV,M2::OcTreeMeshFV)
-	isEqual = fill(true,21)
+	isEqual = trues(21)
 
 
 	# check mandatory fields
@@ -145,7 +144,7 @@ function ==(M1::OcTreeMeshFV,M2::OcTreeMeshFV)
 		isEqual[15] = (M1.V == M2.V)
 	end
 	if !(isempty(M1.Ne)) && !(isempty(M2.Ne))
-		isEqual[21] = (M1.Ne == M2.Ne)
+		isEqual[20] = (M1.Ne == M2.Ne)
 	end
 	if !(isempty(M1.Nn)) && !(isempty(M2.Nn))
 		isEqual[21] = (M1.Nn == M2.Nn)

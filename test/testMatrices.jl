@@ -1,4 +1,4 @@
-
+@testset "Matrices" begin
 using JOcTree
 using Base.Test
 
@@ -152,8 +152,8 @@ for i = 1 : ntests-1
 end  # i
 
 
-using PyPlot
-loglog( ncells, NdifGRAD, "r.-")
-loglog( ncells, NdifDIV,  "g.-")
-loglog( ncells, NdifCURL, "b.-")
-
+# using PyPlot
+# loglog( ncells, NdifGRAD, "r.-")
+# loglog( ncells, NdifDIV,  "g.-")
+# loglog( ncells, NdifCURL, "b.-")
+end
