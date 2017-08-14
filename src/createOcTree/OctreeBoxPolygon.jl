@@ -121,8 +121,13 @@ while true
       jj = j[ic]
       kk = k[ic]
 
-      k1 = minimum(itopo[ii:ii+bb-1, jj:jj+bb-1])
-      k2 = maximum(itopo[ii:ii+bb-1, jj:jj+bb-1])
+      if length(itopo) == 1
+         k1 = itopo[1,1]
+         k2 = itopo[1,1]
+      else
+         k1 = minimum(itopo[ii:ii+bb-1, jj:jj+bb-1])
+         k2 = maximum(itopo[ii:ii+bb-1, jj:jj+bb-1])
+      end
 
       if kk+bb-1 >= k1 && kk <= k2
          # X,Y points making up the cell
@@ -208,8 +213,13 @@ while true
       jj = j[ic]
       kk = k[ic]
 
-      k1 = minimum(itopo[ii:ii+bb-1, jj:jj+bb-1]) - ndepth
-      k2 = maximum(itopo[ii:ii+bb-1, jj:jj+bb-1])
+      if length(itopo) == 1
+         k1 = itopo[1,1] - ndepth
+         k2 = itopo[1,1]
+      else
+         k1 = minimum(itopo[ii:ii+bb-1, jj:jj+bb-1]) - ndepth
+         k2 = maximum(itopo[ii:ii+bb-1, jj:jj+bb-1])
+      end
 
       if kk+bb-1 >= k1 && kk <= k2
          # X,Y points making up the cell
