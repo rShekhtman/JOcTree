@@ -2,7 +2,7 @@ export getEdgeToCellCenteredMatrix, getEdgeAverageMatrix
 
 function getEdgeAverageMatrix(M::OcTreeMesh)
 	if isempty(M.Ae)
-		M.Ae = getEdgeMassMatrixAnisotropic(M.S,M.h)
+		M.Ae, = getEdgeToCellCenteredMatrix(M.S)
 	end
 	return M.Ae
 end

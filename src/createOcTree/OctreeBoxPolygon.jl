@@ -18,10 +18,12 @@ end
 const dx = h[1]
 const dy = h[2]
 
-min_x = minimum(x)
-max_x = maximum(x)
-min_y = minimum(y)
-max_y = maximum(y)
+#min_x = minimum(x)
+#max_x = maximum(x)
+#min_y = minimum(y)
+#max_y = maximum(y)
+min_x, max_x = extrema(x)
+min_y, max_y = extrema(y)
 
 
 while true
@@ -89,7 +91,7 @@ function OctreeBoxPolygonTopo( S::SparseArray3D,
                            h::Vector{Float64},          # (3) underlying cell size
                            x0::Vector{Float64},         # corner coordinates
                            x::Vector{Float64}, y::Vector{Float64},  # polygon points
-                           itopo::Array{Int64,2},       # # of SURFACE cells
+                           itopo::Array{Int32,2},       # # of SURFACE cells
                            cellsize)
 # Sf( (x,y), itopo ) = cellsize
 # Set cells inside the polygon (x,y) to cellsize.
@@ -97,10 +99,12 @@ function OctreeBoxPolygonTopo( S::SparseArray3D,
 const dx = h[1]
 const dy = h[2]
 
-min_x = minimum(x)
-max_x = maximum(x)
-min_y = minimum(y)
-max_y = maximum(y)
+#min_x = minimum(x)
+#max_x = maximum(x)
+#min_y = minimum(y)
+#max_y = maximum(y)
+min_x, max_x = extrema(x)
+min_y, max_y = extrema(y)
 
 
 while true
@@ -177,7 +181,7 @@ function OctreePolygonBelowSurf( S::SparseArray3D,
                            h::Vector{Float64},          # (3) underlying cell size
                            x0::Vector{Float64},         # corner coordinates
                            x::Vector{Float64}, y::Vector{Float64},  # polygon points
-                           itopo::Array{Int64,2},       # # of SURFACE cells
+                           itopo::Array{Int32,2},       # # of SURFACE cells
                            depth::Float64,              # how far down to go
                            cellsize)
 # Sf( (x,y), ndepth:itopo ) = cellsize
@@ -187,12 +191,14 @@ dx = h[1]
 dy = h[2]
 dz = h[3]
 
-ndepth = cld(depth, dz)  # how many fine cells down to go
+ndepth = trunc(Int, cld(depth, dz))  # how many fine cells down to go
 
-min_x = minimum(x)
-max_x = maximum(x)
-min_y = minimum(y)
-max_y = maximum(y)
+#min_x = minimum(x)
+#max_x = maximum(x)
+#min_y = minimum(y)
+#max_y = maximum(y)
+min_x, max_x = extrema(x)
+min_y, max_y = extrema(y)
 
 
 while true

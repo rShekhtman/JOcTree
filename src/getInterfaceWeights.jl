@@ -3,7 +3,7 @@ export getInterfaceWeights
 
 function getInterfaceWeights(
                      M::OcTreeMeshFV,
-                     itopo::Array{Int64,2}, # # of SURFACE cells
+                     itopo::Array{Int32,2}, # # of SURFACE cells
                      surfweight::Vector{Float64},   # values to assign to the surface cells
                      C=[] )  # alpha values
 
@@ -41,8 +41,12 @@ for i = 1:nXfaces
       continue  # mesh edge
    end
 
-   itp = min( itopo[ii[i]-1,jj[i]],
-              itopo[ii[i]  ,jj[i]] )
+   if length(itopo) == 1
+      itp = itopo[1,1]
+   else
+      itp = min( itopo[ii[i]-1,jj[i]],
+                 itopo[ii[i]  ,jj[i]] )
+   end
 
    heightbot = kk[i]
    height = heightbot + fsz[i] - 1
@@ -63,8 +67,12 @@ for i = 1:nYfaces
       continue  # mesh edge
    end
 
-   itp = min( itopo[ii[i], jj[i]-1],
-              itopo[ii[i], jj[i]  ] )
+   if length(itopo) == 1
+      itp = itopo[1,1]
+   else
+      itp = min( itopo[ii[i], jj[i]-1],
+                 itopo[ii[i], jj[i]  ] )
+   end
 
    heightbot = kk[i]
    height = heightbot + fsz[i] - 1
